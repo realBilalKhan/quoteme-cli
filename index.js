@@ -9,15 +9,23 @@ import { createCanvas, loadImage } from "canvas";
 import terminalImage from "terminal-image";
 import { config } from "dotenv";
 import boxen from "boxen";
+import { buddies } from "./buddies.js";
 
 config();
 
 const username = os.userInfo().username || "there";
+const buddy = buddies[Math.floor(Math.random() * buddies.length)];
 
 console.log(
   chalk.cyan(figlet.textSync("QuoteMe", { horizontalLayout: "full" }))
 );
-console.log(chalk.yellow(`Hello ${username}!\n`));
+
+const buddyLines = buddy.trimEnd().split("\n");
+
+const greeting = chalk.yellow(` Hello ${username}!`);
+buddyLines[buddyLines.length - 1] += greeting;
+
+console.log(chalk.green(buddyLines.join("\n")) + "\n");
 
 const localQuotesPath = path.join(process.cwd(), "quotes.json");
 const localQuotes = JSON.parse(fs.readFileSync(localQuotesPath, "utf-8"));
