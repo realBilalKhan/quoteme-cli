@@ -5,7 +5,7 @@ import fs from "fs";
 import path from "path";
 import chalk from "chalk";
 import figlet from "figlet";
-import { createCanvas, loadImage, registerFont } from "canvas";
+import { createCanvas, loadImage } from "canvas";
 import terminalImage from "terminal-image";
 import { config } from "dotenv";
 import boxen from "boxen";
@@ -21,6 +21,18 @@ console.log(chalk.yellow(`Hello ${username}!\n`));
 
 const localQuotesPath = path.join(process.cwd(), "quotes.json");
 const localQuotes = JSON.parse(fs.readFileSync(localQuotesPath, "utf-8"));
+
+const borderStyles = ["single", "double", "round", "bold", "classic"];
+const borderColors = ["cyan", "yellow", "green", "magenta", "blue", "red"];
+
+function getRandomFrameOptions() {
+  return {
+    padding: 1,
+    margin: 1,
+    borderStyle: borderStyles[Math.floor(Math.random() * borderStyles.length)],
+    borderColor: borderColors[Math.floor(Math.random() * borderColors.length)],
+  };
+}
 
 const configPath = path.join(process.cwd(), "quoteme.config.json");
 let userConfig = {};
@@ -313,12 +325,7 @@ async function getQuote() {
       `${chalk.green.bold(`"${data[0].q}"`)}\n\n${chalk.magenta(
         `— ${data[0].a}`
       )}`,
-      {
-        padding: 1,
-        margin: 1,
-        borderStyle: "round",
-        borderColor: "cyan",
-      }
+      getRandomFrameOptions()
     );
 
     console.log(quoteBox);
@@ -369,12 +376,7 @@ async function getQuote() {
       `${chalk.green.bold(`"${randomQuote.text}"`)}\n\n${chalk.magenta(
         `— ${randomQuote.author}`
       )}`,
-      {
-        padding: 1,
-        margin: 1,
-        borderStyle: "round",
-        borderColor: "yellow",
-      }
+      getRandomFrameOptions()
     );
 
     console.log(quoteBox);
