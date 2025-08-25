@@ -8,6 +8,7 @@ import figlet from "figlet";
 import { createCanvas, loadImage, registerFont } from "canvas";
 import terminalImage from "terminal-image";
 import { config } from "dotenv";
+import boxen from "boxen";
 
 config();
 
@@ -308,8 +309,19 @@ async function getQuote() {
       author = data[0].a;
     }
 
-    console.log(chalk.green(`"${quote}"`));
-    console.log(chalk.magenta(`— ${author}\n`));
+    const quoteBox = boxen(
+      `${chalk.green.bold(`"${data[0].q}"`)}\n\n${chalk.magenta(
+        `— ${data[0].a}`
+      )}`,
+      {
+        padding: 1,
+        margin: 1,
+        borderStyle: "round",
+        borderColor: "cyan",
+      }
+    );
+
+    console.log(quoteBox);
 
     if (generateImage) {
       console.log(
@@ -353,8 +365,19 @@ async function getQuote() {
   } catch (err) {
     const randomQuote =
       localQuotes[Math.floor(Math.random() * localQuotes.length)];
-    console.log(chalk.green(`"${randomQuote.text}"`));
-    console.log(chalk.magenta(`— ${randomQuote.author}\n`));
+    const quoteBox = boxen(
+      `${chalk.green.bold(`"${randomQuote.text}"`)}\n\n${chalk.magenta(
+        `— ${randomQuote.author}`
+      )}`,
+      {
+        padding: 1,
+        margin: 1,
+        borderStyle: "round",
+        borderColor: "yellow",
+      }
+    );
+
+    console.log(quoteBox);
 
     if (generateImage) {
       try {
