@@ -81,6 +81,7 @@ function getDefaultSaveDir() {
   return quotemeDir;
 }
 
+let factMode = false;
 const args = process.argv.slice(2);
 let authorFilter = null;
 let generateImage = false;
@@ -111,6 +112,8 @@ for (let i = 0; i < args.length; i++) {
       outputPath = args[i + 1];
       i++;
     }
+  } else if (args[i] === "--fact" || args[i] === "-f") {
+    factMode = true;
   }
 }
 
@@ -192,6 +195,32 @@ async function getRandomBackgroundImage(width, height) {
   }
 
   return null;
+}
+
+async function getFact() {
+  try {
+    const res = await fetch(
+      "https://uselessfacts.jsph.pl/random.json?language=en"
+    );
+    if (!res.ok) throw new Error("API response not OK");
+    const data = await res.json();
+
+    const factBox = boxen(
+      `${chalk.cyan.bold("🤯 Fun Fact:")}\n\n${chalk.whiteBright(data.text)}`,
+      {
+        padding: 1,
+        margin: 1,
+        borderStyle: "round",
+        borderColor: "cyan",
+      }
+    );
+
+    console.log(factBox);
+  } catch (err) {
+    console.log(chalk.red("⚠️  Could not fetch fun fact, try again later.\n"));
+  } finally {
+    console.log(chalk.blueBright("✨ Keep learning something new! ✨\n"));
+  }
 }
 
 async function generateQuoteImage(quote, author) {
@@ -280,18 +309,6 @@ async function generateQuoteImage(quote, author) {
   ctx.shadowBlur = 0;
   ctx.shadowOffsetX = 0;
   ctx.shadowOffsetY = 0;
-
-  ctx.strokeStyle = "#ffffff";
-  ctx.lineWidth = 3;
-  ctx.beginPath();
-  ctx.moveTo(width / 2 - 100, startY - 40);
-  ctx.lineTo(width / 2 + 100, startY - 40);
-  ctx.stroke();
-
-  ctx.beginPath();
-  ctx.moveTo(width / 2 - 100, startY + totalQuoteHeight + spacing + 50);
-  ctx.lineTo(width / 2 + 100, startY + totalQuoteHeight + spacing + 50);
-  ctx.stroke();
 
   return canvas;
 }
@@ -432,4 +449,8 @@ async function getQuote() {
   }
 }
 
-getQuote();
+if (factMode) {
+  getFact();
+} else {
+  getQuote();
+}
