@@ -4,30 +4,25 @@ import os from "os";
 import fs from "fs";
 import path from "path";
 import chalk from "chalk";
-import figlet from "figlet";
 import { createCanvas, loadImage } from "canvas";
 import terminalImage from "terminal-image";
 import { config } from "dotenv";
 import boxen from "boxen";
-import { buddies } from "./buddies.js";
+import { buddies } from "./data/buddies.js";
 
 config();
 
 const username = os.userInfo().username || "there";
 const buddy = buddies[Math.floor(Math.random() * buddies.length)];
 
-console.log(
-  chalk.cyan(figlet.textSync("QuoteMe", { horizontalLayout: "full" }))
-);
-
 const buddyLines = buddy.trimEnd().split("\n");
 
-const greeting = chalk.yellow(` Hello ${username}!`);
+const greeting = chalk.yellow(` Hello, ${username}!`);
 buddyLines[buddyLines.length - 1] += greeting;
 
 console.log(chalk.green(buddyLines.join("\n")) + "\n");
 
-const localQuotesPath = path.join(process.cwd(), "quotes.json");
+const localQuotesPath = path.join(process.cwd(), "data", "quotes.json");
 const localQuotes = JSON.parse(fs.readFileSync(localQuotesPath, "utf-8"));
 
 const borderStyles = ["single", "double", "round", "bold", "classic"];
@@ -82,6 +77,7 @@ function getDefaultSaveDir() {
 }
 
 let factMode = false;
+let jokeMode = false;
 const args = process.argv.slice(2);
 let authorFilter = null;
 let generateImage = false;
@@ -114,6 +110,8 @@ for (let i = 0; i < args.length; i++) {
     }
   } else if (args[i] === "--fact" || args[i] === "-f") {
     factMode = true;
+  } else if (args[i] === "--joke" || args[i] === "-j") {
+    jokeMode = true;
   }
 }
 
@@ -220,6 +218,70 @@ async function getFact() {
     console.log(chalk.red("⚠️  Could not fetch fun fact, try again later.\n"));
   } finally {
     console.log(chalk.blueBright("✨ Keep learning something new! ✨\n"));
+  }
+}
+
+async function getJoke() {
+  try {
+    const res = await fetch(
+      "https://official-joke-api.appspot.com/random_joke"
+    );
+    if (!res.ok) throw new Error("API response not OK");
+    const data = await res.json();
+
+    const jokeBox = boxen(
+      `${chalk.magenta.bold("😂 Random Joke:")}\n\n${chalk.whiteBright(
+        data.setup
+      )}\n\n${chalk.yellow(data.punchline)}`,
+      {
+        padding: 1,
+        margin: 1,
+        borderStyle: "round",
+        borderColor: "magenta",
+      }
+    );
+
+    console.log(jokeBox);
+  } catch (err) {
+    console.log(
+      chalk.yellow(
+        "⚠️  Could not fetch joke from API, using local fallback...\n"
+      )
+    );
+
+    if (localJokes.length > 0) {
+      const randomJoke =
+        localJokes[Math.floor(Math.random() * localJokes.length)];
+
+      let jokeContent;
+      if (randomJoke.setup && randomJoke.punchline) {
+        jokeContent = `${chalk.whiteBright(randomJoke.setup)}\n\n${chalk.yellow(
+          randomJoke.punchline
+        )}`;
+      } else if (randomJoke.joke) {
+        jokeContent = chalk.whiteBright(randomJoke.joke);
+      } else {
+        jokeContent = chalk.whiteBright(randomJoke.toString());
+      }
+
+      const jokeBox = boxen(
+        `${chalk.magenta.bold("😂 Random Joke:")}\n\n${jokeContent}`,
+        {
+          padding: 1,
+          margin: 1,
+          borderStyle: "round",
+          borderColor: "magenta",
+        }
+      );
+
+      console.log(jokeBox);
+    } else {
+      console.log(
+        chalk.red("⚠️  No local jokes available either, try again later.\n")
+      );
+    }
+  } finally {
+    console.log(chalk.blueBright("✨ Keep smiling! ✨\n"));
   }
 }
 
@@ -451,6 +513,8 @@ async function getQuote() {
 
 if (factMode) {
   getFact();
+} else if (jokeMode) {
+  getJoke();
 } else {
   getQuote();
 }

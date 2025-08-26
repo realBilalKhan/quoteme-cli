@@ -1,24 +1,44 @@
 {
   "name": "quoteme-cli",
   "version": "1.0.0",
+  "description": "A delightful CLI tool for daily inspiration with quotes and fun facts",
   "main": "index.js",
   "type": "module",
   "bin": {
     "quoteme": "index.js"
   },
   "scripts": {
+    "start": "node index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "description": "",
+  "keywords": [
+    "quotes",
+    "cli",
+    "inspiration",
+    "terminal",
+    "facts",
+    "motivation",
+    "daily",
+    "ascii-art"
+  ],
+  "author": "M. Bilal Khan <intelligencexempire@example.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/realBilalKhan/quoteme-cli.git"
+  },
+  "bugs": {
+    "url": "https://github.com/realBilalKhan/quoteme-cli/issues"
+  },
+  "homepage": "https://github.com/realBilalKhan/quoteme-cli#readme",
+  "engines": {
+    "node": ">=14.0.0"
+  },
   "dependencies": {
     "boxen": "^8.0.1",
     "canvas": "^3.2.0",
     "chalk": "^5.6.0",
     "dotenv": "^16.4.5",
-    "figlet": "^1.8.2",
     "terminal-image": "^3.1.1"
   }
 }
