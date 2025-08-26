@@ -2,6 +2,8 @@
 
 QuoteMe is a fun terminal tool that greets you with a buddy, shows random quotes (filterable by author), facts, and jokes, and can generate wallpapers or custom-sized quote images. It also supports auto-display on session start for daily inspiration.
 
+![QuoteMe Screenshot 1](https://hc-cdn.hel1.your-objectstorage.com/s/v3/8ec90fb72574e05c301922ec8cbaa4b109c08cda_quoteme.gif)
+
 ## Installation
 
 Make sure you have the following before installation:
@@ -28,3 +30,5 @@ npm install -g quoteme
 | `quoteme --disable`     | Disable quotes on terminal startup |
 | `quoteme --auto-status` | Show auto-display status           |
 | `quoteme -h, --help`    | Show this help message             |
+
+![QuoteMe Screenshot 2](https://hc-cdn.hel1.your-objectstorage.com/s/v3/ae39dae610766c198326dd5bd20aaf98db765028_quote-2025-08-26t15-12-45.png)
