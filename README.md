@@ -1,48 +1,30 @@
-# QuoteMe CLI
+# QuoteMe
 
-A delightful command-line tool that brings daily inspiration with beautiful quotes, fun facts, and ASCII art buddies!
+QuoteMe is a fun terminal tool that greets you with a buddy, shows random quotes (filterable by author), facts, and jokes, and can generate wallpapers or custom-sized quote images. It also supports auto-display on session start for daily inspiration.
 
-# Get a random quote
+## Installation
 
-```bash
-quoteme
-```
+Make sure you have the following before installation:
 
-# Get a quote by specific author
+- **[Node.js](https://nodejs.org/)**: version **14.0.0 or higher** (recommended: latest LTS)
 
-```bash
-quoteme --author "Einstein"
-quoteme -a "Shakespeare"
-```
-
-# Get a fun fact instead
+You can install **QuoteMe CLI** globally via npm:
 
 ```bash
-quoteme --fact
-quoteme -f
+npm install -g quoteme
 ```
 
-# Generate and display quote as image
+## Usage
 
-```bash
-quoteme --image
-quoteme -i
-```
-
-# Get a random joke
-
-```bash
-quoteme --joke
-quoteme -j
-```
-
-# Save quote image to file
-
-```bash
-quoteme --save
-quoteme --save /path/to/custom/location.png
-quoteme -s
-
-quoteme --image
-quoteme -i
-```
+| Command                 | Description                        |
+| ----------------------- | ---------------------------------- |
+| `quoteme`               | Show a random quote                |
+| `quoteme -a <author>`   | Show a quote by a specific author  |
+| `quoteme -i [path]`     | Generate and save a quote image    |
+| `quoteme -f`            | Show a random fact                 |
+| `quoteme -j`            | Show a random joke                 |
+| `quoteme -r`            | Set image resolution               |
+| `quoteme --enable`      | Enable quotes on terminal startup  |
+| `quoteme --disable`     | Disable quotes on terminal startup |
+| `quoteme --auto-status` | Show auto-display status           |
+| `quoteme -h, --help`    | Show this help message             |

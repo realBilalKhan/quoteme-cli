@@ -1,7 +1,7 @@
 import chalk from "chalk";
 
 export function showHelp() {
-  console.log(chalk.cyan.bold("QuoteMe CLI - Usage:\n"));
+  console.log(chalk.cyan.bold("📖 QuoteMe Usage:\n"));
   console.log(chalk.white("Basic Commands:"));
   console.log("  quoteme                    Show a random quote");
   console.log("  quoteme -a <author>        Show quote by specific author");

@@ -1,7 +1,7 @@
 {
   "name": "quoteme-cli",
   "version": "1.0.0",
-  "description": "A delightful CLI tool for daily inspiration with quotes and fun facts",
+  "description": "Daily inspiration in your terminal, with quotes, jokes, facts, and even custom quote wallpapers.",
   "main": "index.js",
   "type": "module",
   "bin": {
@@ -21,7 +21,7 @@
     "daily",
     "ascii-art"
   ],
-  "author": "M. Bilal Khan <intelligencexempire@example.com>",
+  "author": "M. Bilal Khan <intelligencexempire@gmail.com>",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -41,5 +41,10 @@
     "dotenv": "^16.4.5",
     "inquirer": "^12.9.4",
     "terminal-image": "^3.1.1"
-  }
+  },
+  "files": [
+    "index.js",
+    "data/",
+    "utils/"
+  ]
 }
