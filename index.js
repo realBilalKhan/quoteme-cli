@@ -9,6 +9,15 @@ import terminalImage from "terminal-image";
 import { config } from "dotenv";
 import boxen from "boxen";
 import { buddies } from "./data/buddies.js";
+import { getRandomFrameOptions } from "./utils/frameOptions.js";
+import {
+  loadUserConfig,
+  updateConfigSaveDirectory,
+  generateSavePath,
+  generateTimestampFilename,
+} from "./utils/fileUtils.js";
+import { getFact } from "./utils/factUtils.js";
+import { getJoke } from "./utils/jokeUtils.js";
 
 config();
 
@@ -25,56 +34,8 @@ console.log(chalk.green(buddyLines.join("\n")) + "\n");
 const localQuotesPath = path.join(process.cwd(), "data", "quotes.json");
 const localQuotes = JSON.parse(fs.readFileSync(localQuotesPath, "utf-8"));
 
-const borderStyles = ["single", "double", "round", "bold", "classic"];
-const borderColors = ["cyan", "yellow", "green", "magenta", "blue", "red"];
-
-function getRandomFrameOptions() {
-  return {
-    padding: 1,
-    margin: 1,
-    borderStyle: borderStyles[Math.floor(Math.random() * borderStyles.length)],
-    borderColor: borderColors[Math.floor(Math.random() * borderColors.length)],
-  };
-}
-
 const configPath = path.join(process.cwd(), "quoteme.config.json");
-let userConfig = {};
-if (fs.existsSync(configPath)) {
-  try {
-    userConfig = JSON.parse(fs.readFileSync(configPath, "utf-8"));
-  } catch (error) {
-    console.log(
-      chalk.yellow("⚠️  Could not parse config file, using defaults")
-    );
-  }
-}
-
-function getDownloadsDir() {
-  const homeDir = os.homedir();
-  const platform = os.platform();
-
-  switch (platform) {
-    case "win32":
-      return path.join(homeDir, "Downloads");
-    case "darwin":
-      return path.join(homeDir, "Downloads");
-    case "linux":
-      return path.join(homeDir, "Downloads");
-    default:
-      return path.join(homeDir, "Downloads");
-  }
-}
-
-function getDefaultSaveDir() {
-  const downloadsDir = getDownloadsDir();
-  const quotemeDir = path.join(downloadsDir, "quoteme images");
-
-  if (!fs.existsSync(quotemeDir)) {
-    fs.mkdirSync(quotemeDir, { recursive: true });
-  }
-
-  return quotemeDir;
-}
+let userConfig = loadUserConfig(configPath);
 
 let factMode = false;
 let jokeMode = false;
@@ -102,8 +63,6 @@ for (let i = 0; i < args.length; i++) {
     }
   } else if (args[i] === "--image" || args[i] === "-i") {
     generateImage = true;
-  } else if (args[i] === "--save" || args[i] === "-s") {
-    generateImage = true;
     if (args[i + 1] && !args[i + 1].startsWith("-")) {
       outputPath = args[i + 1];
       i++;
@@ -115,7 +74,7 @@ for (let i = 0; i < args.length; i++) {
   }
 }
 
-function wrapText(ctx, text, maxWidth, lineHeight) {
+function wrapText(ctx, text, maxWidth) {
   const words = text.split(" ");
   const lines = [];
   let currentLine = words[0];
@@ -193,96 +152,6 @@ async function getRandomBackgroundImage(width, height) {
   }
 
   return null;
-}
-
-async function getFact() {
-  try {
-    const res = await fetch(
-      "https://uselessfacts.jsph.pl/random.json?language=en"
-    );
-    if (!res.ok) throw new Error("API response not OK");
-    const data = await res.json();
-
-    const factBox = boxen(
-      `${chalk.cyan.bold("🤯 Fun Fact:")}\n\n${chalk.whiteBright(data.text)}`,
-      {
-        padding: 1,
-        margin: 1,
-        borderStyle: "round",
-        borderColor: "cyan",
-      }
-    );
-
-    console.log(factBox);
-  } catch (err) {
-    console.log(chalk.red("⚠️  Could not fetch fun fact, try again later.\n"));
-  } finally {
-    console.log(chalk.blueBright("✨ Keep learning something new! ✨\n"));
-  }
-}
-
-async function getJoke() {
-  try {
-    const res = await fetch(
-      "https://official-joke-api.appspot.com/random_joke"
-    );
-    if (!res.ok) throw new Error("API response not OK");
-    const data = await res.json();
-
-    const jokeBox = boxen(
-      `${chalk.magenta.bold("😂 Random Joke:")}\n\n${chalk.whiteBright(
-        data.setup
-      )}\n\n${chalk.yellow(data.punchline)}`,
-      {
-        padding: 1,
-        margin: 1,
-        borderStyle: "round",
-        borderColor: "magenta",
-      }
-    );
-
-    console.log(jokeBox);
-  } catch (err) {
-    console.log(
-      chalk.yellow(
-        "⚠️  Could not fetch joke from API, using local fallback...\n"
-      )
-    );
-
-    if (localJokes.length > 0) {
-      const randomJoke =
-        localJokes[Math.floor(Math.random() * localJokes.length)];
-
-      let jokeContent;
-      if (randomJoke.setup && randomJoke.punchline) {
-        jokeContent = `${chalk.whiteBright(randomJoke.setup)}\n\n${chalk.yellow(
-          randomJoke.punchline
-        )}`;
-      } else if (randomJoke.joke) {
-        jokeContent = chalk.whiteBright(randomJoke.joke);
-      } else {
-        jokeContent = chalk.whiteBright(randomJoke.toString());
-      }
-
-      const jokeBox = boxen(
-        `${chalk.magenta.bold("😂 Random Joke:")}\n\n${jokeContent}`,
-        {
-          padding: 1,
-          margin: 1,
-          borderStyle: "round",
-          borderColor: "magenta",
-        }
-      );
-
-      console.log(jokeBox);
-    } else {
-      console.log(
-        chalk.red("⚠️  No local jokes available either, try again later.\n")
-      );
-    }
-  } finally {
-    console.log(chalk.blueBright("✨ Keep smiling! ✨\n"));
-  }
 }
 
 async function generateQuoteImage(quote, author) {
@@ -429,23 +298,15 @@ async function getQuote() {
         console.log(await terminalImage.buffer(buffer, { width: "50%" }));
         console.log();
 
-        const timestamp = new Date()
-          .toISOString()
-          .replace(/[:.]/g, "-")
-          .slice(0, 19);
-        const defaultFilename = `quote-${timestamp}.png`;
+        const defaultFilename = generateTimestampFilename("quote");
+        const savePath = generateSavePath(
+          outputPath,
+          userConfig,
+          defaultFilename
+        );
 
-        let savePath;
         if (outputPath) {
-          savePath = outputPath;
-        } else {
-          const saveDir = userConfig.saveDirectory || getDefaultSaveDir();
-
-          if (!fs.existsSync(saveDir)) {
-            fs.mkdirSync(saveDir, { recursive: true });
-          }
-
-          savePath = path.join(saveDir, defaultFilename);
+          updateConfigSaveDirectory(configPath, userConfig, savePath);
         }
 
         fs.writeFileSync(savePath, buffer);
@@ -479,23 +340,15 @@ async function getQuote() {
         console.log(await terminalImage.buffer(buffer, { width: "50%" }));
         console.log();
 
-        const timestamp = new Date()
-          .toISOString()
-          .replace(/[:.]/g, "-")
-          .slice(0, 19);
-        const defaultFilename = `quote-${timestamp}.png`;
+        const defaultFilename = generateTimestampFilename("quote");
+        const savePath = generateSavePath(
+          outputPath,
+          userConfig,
+          defaultFilename
+        );
 
-        let savePath;
         if (outputPath) {
-          savePath = outputPath;
-        } else {
-          const saveDir = userConfig.saveDirectory || getDefaultSaveDir();
-
-          if (!fs.existsSync(saveDir)) {
-            fs.mkdirSync(saveDir, { recursive: true });
-          }
-
-          savePath = path.join(saveDir, defaultFilename);
+          updateConfigSaveDirectory(configPath, userConfig, savePath);
         }
 
         fs.writeFileSync(savePath, buffer);
