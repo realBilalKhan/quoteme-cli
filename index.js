@@ -18,6 +18,11 @@ import {
 } from "./utils/fileUtils.js";
 import { getFact } from "./utils/factUtils.js";
 import { getJoke } from "./utils/jokeUtils.js";
+import {
+  getCurrentResolution,
+  handleResolutionSelection,
+  displayCurrentResolution,
+} from "./utils/resolutionUtils.js";
 
 config();
 
@@ -39,6 +44,7 @@ let userConfig = loadUserConfig(configPath);
 
 let factMode = false;
 let jokeMode = false;
+let resolutionMode = false;
 const args = process.argv.slice(2);
 let authorFilter = null;
 let generateImage = false;
@@ -71,6 +77,8 @@ for (let i = 0; i < args.length; i++) {
     factMode = true;
   } else if (args[i] === "--joke" || args[i] === "-j") {
     jokeMode = true;
+  } else if (args[i] === "--resolution" || args[i] === "-r") {
+    resolutionMode = true;
   }
 }
 
@@ -154,9 +162,11 @@ async function getRandomBackgroundImage(width, height) {
   return null;
 }
 
-async function generateQuoteImage(quote, author) {
-  const width = 1200;
-  const height = 800;
+async function generateQuoteImage(quote, author, resolution = null) {
+  const currentResolution = resolution || getCurrentResolution(userConfig);
+  const width = currentResolution.width;
+  const height = currentResolution.height;
+
   const canvas = createCanvas(width, height);
   const ctx = canvas.getContext("2d");
 
@@ -219,20 +229,26 @@ async function generateQuoteImage(quote, author) {
   ctx.shadowOffsetY = 2;
 
   const maxQuoteWidth = width - 200;
-  ctx.font = "bold 48px Arial, sans-serif";
-  const quoteLines = wrapText(ctx, `"${quote}"`, maxQuoteWidth, 60);
+  const baseFontSize = Math.min(48, width / 25);
+  ctx.font = `bold ${baseFontSize}px Arial, sans-serif`;
+  const quoteLines = wrapText(
+    ctx,
+    `"${quote}"`,
+    maxQuoteWidth,
+    baseFontSize + 12
+  );
 
-  const totalQuoteHeight = quoteLines.length * 60;
-  const authorHeight = 40;
-  const spacing = 60;
+  const totalQuoteHeight = quoteLines.length * (baseFontSize + 12);
+  const authorHeight = baseFontSize * 0.8;
+  const spacing = baseFontSize + 12;
   const totalHeight = totalQuoteHeight + spacing + authorHeight;
-  let startY = (height - totalHeight) / 2 + 60;
+  let startY = (height - totalHeight) / 2 + (baseFontSize + 12);
 
   quoteLines.forEach((line, index) => {
-    ctx.fillText(line, width / 2, startY + index * 60);
+    ctx.fillText(line, width / 2, startY + index * (baseFontSize + 12));
   });
 
-  ctx.font = "italic 36px Arial, sans-serif";
+  ctx.font = `italic ${Math.floor(baseFontSize * 0.75)}px Arial, sans-serif`;
   ctx.fillStyle = "#f0f0f0";
   ctx.fillText(`— ${author}`, width / 2, startY + totalQuoteHeight + spacing);
 
@@ -290,6 +306,7 @@ async function getQuote() {
       console.log(
         chalk.blue("🎨 Generating quote image with scenic background...\n")
       );
+      displayCurrentResolution(userConfig);
 
       try {
         const canvas = await generateQuoteImage(quote, author);
@@ -331,6 +348,8 @@ async function getQuote() {
 
     if (generateImage) {
       try {
+        displayCurrentResolution(userConfig);
+
         const canvas = await generateQuoteImage(
           randomQuote.text,
           randomQuote.author
@@ -368,6 +387,16 @@ if (factMode) {
   getFact();
 } else if (jokeMode) {
   getJoke();
+} else if (resolutionMode) {
+  const selectedResolution = await handleResolutionSelection(
+    configPath,
+    userConfig
+  );
+  console.log(
+    chalk.green(
+      `🎯 Resolution set to: ${selectedResolution.width}x${selectedResolution.height}`
+    )
+  );
 } else {
   getQuote();
 }
