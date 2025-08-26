@@ -2,7 +2,7 @@
 
 QuoteMe is a fun terminal tool that greets you with a buddy, shows random quotes (filterable by author), facts, and jokes, and can generate wallpapers or custom-sized quote images. It also supports auto-display on session start for daily inspiration.
 
-![QuoteMe Screenshot 1](https://hc-cdn.hel1.your-objectstorage.com/s/v3/832896cb60641397296044e60bd7e86aac01ed9c_screenshot_2025-08-26_at_20.48.50.png)
+![QuoteMe Screenshot 1](https://hc-cdn.hel1.your-objectstorage.com/s/v3/a814502e2142a83d473da8211308cb10797459bd_screenshot_2025-08-26_at_20.53.36.png)
 
 ## Installation
 
