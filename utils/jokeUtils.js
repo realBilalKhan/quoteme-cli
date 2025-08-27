@@ -7,12 +7,12 @@ import { getRandomFrameOptions } from "./frameOptions.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const localFactsPath = path.join(__dirname, "..", "data", "jokes.json");
+const localJokesPath = path.join(__dirname, "..", "data", "jokes.json");
 
-let localFacts = [];
+let localJokes = [];
 
 try {
-  localFacts = JSON.parse(fs.readFileSync(localFactsPath, "utf-8"));
+  localJokes = JSON.parse(fs.readFileSync(localJokesPath, "utf-8"));
 } catch (err) {
   console.log(
     chalk.yellow("ℹ️  Local jokes file not found, will only use API")

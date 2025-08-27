@@ -16,7 +16,7 @@ function getDownloadsDir() {
   }
 }
 
-function getDefaultSaveDir() {
+export function getDefaultSaveDir() {
   const downloadsDir = getDownloadsDir();
   const quotemeDir = path.join(downloadsDir, "quoteme images");
 
