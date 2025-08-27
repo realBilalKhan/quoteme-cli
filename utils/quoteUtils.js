@@ -2,12 +2,24 @@ import chalk from "chalk";
 import boxen from "boxen";
 import path from "path";
 import fs from "fs";
+import { fileURLToPath } from "url";
 import { getRandomFrameOptions } from "./frameOptions.js";
 import { handleImageGeneration } from "./imageUtils.js";
 import { displayCurrentResolution } from "./resolutionUtils.js";
 
-const localQuotesPath = path.join(process.cwd(), "data", "quotes.json");
-const localQuotes = JSON.parse(fs.readFileSync(localQuotesPath, "utf-8"));
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const localFactsPath = path.join(__dirname, "..", "data", "jokes.json");
+
+let localFacts = [];
+
+try {
+  localFacts = JSON.parse(fs.readFileSync(localFactsPath, "utf-8"));
+} catch (err) {
+  console.log(
+    chalk.yellow("ℹ️  Local jokes file not found, will only use API")
+  );
+}
 
 export async function getQuote({
   authorFilter,

@@ -13,7 +13,7 @@ Make sure you have the following before installation:
 You can install **QuoteMe CLI** globally via npm:
 
 ```bash
-npm install -g quoteme-cli
+npm install -g quoteme-cli@latest
 ```
 
 ## Usage

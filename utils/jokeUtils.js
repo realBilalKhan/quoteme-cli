@@ -1,11 +1,23 @@
 import fs from "fs";
 import path from "path";
+import { fileURLToPath } from "url";
 import chalk from "chalk";
 import boxen from "boxen";
 import { getRandomFrameOptions } from "./frameOptions.js";
 
-const localJokesPath = path.join(process.cwd(), "data", "jokes.json");
-const localJokes = JSON.parse(fs.readFileSync(localJokesPath, "utf-8"));
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const localFactsPath = path.join(__dirname, "..", "data", "jokes.json");
+
+let localFacts = [];
+
+try {
+  localFacts = JSON.parse(fs.readFileSync(localFactsPath, "utf-8"));
+} catch (err) {
+  console.log(
+    chalk.yellow("ℹ️  Local jokes file not found, will only use API")
+  );
+}
 
 export async function getJoke() {
   try {
